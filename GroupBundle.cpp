@@ -29,17 +29,6 @@ GroupBundle::GroupBundle(RCSwitch *sender) : m_actors(NULL), m_groups(NULL), m_n
   // Actor On: 00000FF0FF0F/5201, Off: 00000FF0FFF0/5204 Vitrine
   RcActor *living3 = new RcActor(this, sender, 5201, 5204);
 
-/*
-//B ON:  FFFF0F0FFF0F
-//B OFF: FFFF0F0FFFF0
-  
-  RcActor *experimentActor1 = new RcActor(this, sender, triState2Decimal("F00000FFFF0F"), triState2Decimal("F00000FFFFF0"));
-//  RcActor *experimentActor2 = new RcActor(this, sender, 5592415, 5592415);
-  GroupActor *experimentGroup = new GroupActor(this, 20, 1, 1, 1);
-  experimentGroup->addActor(experimentActor1);//->addActor(experimentActor2);
-  // AN:  5510417 5510495 FFF00FFF0F0F
-  // AUS: 5510420 5510495 FFF00FFF0FFF
-*/
   // Group 1 garden (DIP 01111, switch A) Alle Gartendosen gleichzeitig
   // Id: 30 On: F00000FFFF0F/4195665, Off: F00000FFFFF0/4195668
   GroupActor *groupGarden1 = new GroupActor(this, 30, 1, 4195665, 4195668);
