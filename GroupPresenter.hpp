@@ -4,6 +4,7 @@
 #include "Arduino.h"
 
 class NanoESP_HTTP;
+class GroupActor;
 
 class GroupPresenter {
   public:

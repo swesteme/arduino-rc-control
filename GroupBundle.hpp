@@ -27,12 +27,16 @@ public:
 
     // toggle the given actor
     void toggle(const byte id);
+
+    void switchGroup(const byte id, bool toState);
     
     // handle switch by code
-    void handleSwitchCode(unsigned long code) const;
+    void handleSwitchCode(unsigned long code);
 
     // print current JSON configuration
-    void printConfig(GroupPresenter& presenter);
+    void printConfig(GroupPresenter* presenter);
+
+    static unsigned long triState2Decimal(const char *sCodeWord);
 
 private:
     // actor list

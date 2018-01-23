@@ -12,25 +12,25 @@ class GroupBundle;
 
 class Actor {
 public:
-    Actor(GroupBundle *bundle, const char *codeOn, const char *codeOff);
+    Actor(GroupBundle *bundle, unsigned long codeOn, unsigned long codeOff);
     
     // get actor name
     const char * getName() const;
 
     // switch actor on
-    virtual void switchOn() const = 0;
+    virtual void switchOn() = 0;
 
     // switch actor off
-    virtual void switchOff() const = 0;
+    virtual void switchOff() = 0;
 
     // check, whether a supplied code matches this actor
-    bool matchesCode(unsigned long code) const;
+    bool matchesCode(unsigned long code);
 
     // convert tri-state to decimal
     static unsigned long triState2Decimal(const char *code);
 
 private:
-    void setString(char **target, const char* source, int num);
+//    void setString(char **target, const char* source, int num);
     
 protected:
     // code to switch on actor

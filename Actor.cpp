@@ -8,12 +8,13 @@
 #include "Actor.hpp"
 #include "GroupBundle.hpp"
 
-Actor::Actor(GroupBundle *bundle, const char *codeOn, const char *codeOff) : m_codeOn(triState2Decimal(codeOn)), m_codeOff(triState2Decimal(codeOff)) {
+Actor::Actor(GroupBundle *bundle, unsigned long codeOn, unsigned long codeOff) : m_codeOn(codeOn), m_codeOff(codeOff) {
     // add this actor to list of actors
     bundle->addActor(this);
+//    Serial.println("Actor On: " + String(codeOn) + "/" + String(m_codeOn) + ", Off: " + String(codeOff) + "/" + m_codeOff);
 }
 
-bool Actor::matchesCode(unsigned long code) const {
+bool Actor::matchesCode(unsigned long code) {
   // check, whether we have to switch on this actor
   if (m_codeOn == code) {
     switchOn();
@@ -28,30 +29,5 @@ bool Actor::matchesCode(unsigned long code) const {
 
   // nothing to do
   return false;
-}
-
-
-static unsigned long Actor::triState2Decimal(const char *sCodeWord) {
-  // turn the tristate code word into the corresponding bit pattern, then send it
-  unsigned long code = 0;
-  unsigned int length = 0;
-  for (const char* p = sCodeWord; *p; p++) {
-    code <<= 2L;
-    switch (*p) {
-      case '0':
-        // bit pattern 00
-        break;
-      case 'F':
-        // bit pattern 01
-        code |= 1L;
-        break;
-      case '1':
-        // bit pattern 11
-        code |= 3L;
-        break;
-    }
-    length += 2;
-  }
-  return code;
 }
 

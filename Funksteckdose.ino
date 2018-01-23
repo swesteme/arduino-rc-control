@@ -1,13 +1,16 @@
 #include <RCSwitch.h>
 #include <NanoESP.h>
 #include <NanoESP_HTTP.h>
-#include <SoftwareSerial.h>
+#include <CapacitiveSensor.h>
+#include <Time.h>
 
 #include "RcActor.hpp"
 #include "GroupActor.hpp"
 #include "GroupBundle.hpp"
 #include "GroupPresenter.hpp"
 #include "passwords.h"
+
+unsigned long previousMillis = 0;   // will store last time a msg was sent
 
 RCSwitch sender = RCSwitch();
 
@@ -16,6 +19,15 @@ NanoESP_HTTP http = NanoESP_HTTP(nanoesp);
 
 #define RC_DEBUG_OUT false
 #define WS_DEBUG_OUT false
+#define SN_DEBUG_OUT true
+
+#define SENSOR_PIN_INPUT  3
+#define SENSOR_PIN_OUTPUT 14
+#define SENSOR_THRESHOLD  8000
+#define SENSOR_DELAY      600
+
+// define the capacitive sensor pin definition
+CapacitiveSensor sensor = CapacitiveSensor(SENSOR_PIN_OUTPUT, SENSOR_PIN_INPUT);
 
 // Bundle for all groups of actors
 GroupBundle *bundle = NULL;
@@ -25,10 +37,11 @@ void setup() {
   Serial.println(F("Init start"));
 
   // initalise nano esp
-  nanoesp.init();
+  nanoesp.init(WS_DEBUG_OUT);
 
   // initialise WIFI
-  if (initWifi()) {
+  if (initWifi()) 
+  {
     // initialise RC sender
     initSender();
 
@@ -37,10 +50,13 @@ void setup() {
 
 #if WS_DEBUG_OUT
     OutputPresenter presenter;
-    bundle->printConfig(presenter);
+    bundle->printConfig(&presenter);
 #endif
   }
 
+  // disable auto calibration
+  sensor.set_CS_AutocaL_Millis(0xFFFFFFFF);
+  
   Serial.println(F("Init end"));
 }
 
@@ -92,12 +108,13 @@ void errorLED(String errorMsg) {
 void loopSender() {
   // check, whether new rc input is available
   if (bundle != NULL && sender.available()) {
-    if (RC_DEBUG_OUT) {
+    #if RC_DEBUG_OUT
       dec2tristate(sender.getReceivedValue(), sender.getReceivedBitlength(), sender.getReceivedDelay(), sender.getReceivedProtocol());
-    }
+    #endif
 
     // check group bundle for codes
     bundle->handleSwitchCode(sender.getReceivedValue());
+
     // reset state
     sender.resetAvailable();
   }
@@ -108,29 +125,58 @@ void loopSender() {
  */
 void loopWebservice() {
   String method, resource, parameter;
-  int id ;
+  int id;
 
   if (http.recvRequest(id, method, resource, parameter)) {
-    if (WS_DEBUG_OUT) {
+    #if WS_DEBUG_OUT
       Serial.println("New Request from id :" + String(id) + ", method: " + method +  ", resource: " + resource +  " parameter: " + parameter);
-    }
+    #endif
 
     // send config
     WebservicePresenter presenter(id, &http);
     // print configuration to webservice
-    bundle->printConfig(presenter);
+    bundle->printConfig(&presenter);
     // close HTTP connection
     nanoesp.closeConnection(id);
-    if (WS_DEBUG_OUT) {
-      Serial.println(F(" DONE"));
-    }
+    #if WS_DEBUG_OUT
+      Serial.println(F("Connection closed."));
+    #endif
 
     // check for GET parameter content
     if (parameter != "") {
       // id=31
-      String sId = parameter.substring(parameter.indexOf('=') + 1);
-      bundle->toggle(sId.toInt());
+      String sId = parameter.substring(parameter.indexOf('=') + 1, parameter.indexOf('&'));
+      String sNewState = parameter.substring(parameter.indexOf('&') + 1);
+      sNewState = sNewState.substring(sNewState.indexOf('=') + 1);
+      bundle->switchGroup(sId.toInt(), sNewState.equals(String(F("on"))));
+      #if WS_DEBUG_OUT
+        Serial.println(String(F("Switch ID: ")) + sId + String(F(" to state: ")) + sNewState);
+      #endif
     }
+  }
+}
+
+void loopButton() {
+  // measure capacitive sensor
+  long measurement = sensor.capacitiveSensor(30);
+  // check the capacitive sensor
+  if (previousMillis == 0 && measurement > SENSOR_THRESHOLD) {
+    // keep milliseconds
+    previousMillis = millis();
+    #if SN_DEBUG_OUT
+      Serial.println(String(measurement));
+    #endif
+    // toggle group
+    bundle->toggle(43);
+  }
+
+  // check whether to reset after delay
+  if (previousMillis > 0 && millis() - previousMillis > SENSOR_DELAY) {
+    digitalWrite(SENSOR_PIN_INPUT, LOW);
+    previousMillis = 0;
+    #if SN_DEBUG_OUT
+      Serial.println(F("RESET!"));
+    #endif
   }
 }
 
@@ -143,6 +189,8 @@ void loop() {
       // Check for incoming webservice requests.
       loopWebservice();
     }
+    // loop button checks
+    loopButton();
   }
 }
 

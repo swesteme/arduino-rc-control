@@ -16,19 +16,28 @@ class GroupBundle;
 
 class GroupActor : public Actor {
 public:
-    GroupActor(GroupBundle *bundle, const byte id, const byte section, const char *codeOn, const char *codeOff);
+    GroupActor(GroupBundle *bundle, const byte id, const byte section, unsigned long codeOn, unsigned long codeOff);
 
+    // get bundle id
+    const byte getId() const;
+    
+    // get bundle section id
+    const byte getSectionId() const;
+    
     // switch actor on
-    virtual void switchOn() const;
+    virtual void switchOn();
 
     // switch actor off
-    virtual void switchOff() const;
+    virtual void switchOff();
 
     // add an additional actor to group
     GroupActor* addActor(Actor *newActor);
 
     // toggle state
     bool toggle(const byte id);
+
+    // switch this group to a state if it matches
+    bool switchGroup(const byte id, bool toState);
 
 // private methods
 private:

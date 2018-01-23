@@ -14,32 +14,57 @@
 
 GroupBundle::GroupBundle(RCSwitch *sender) : m_actors(NULL), m_groups(NULL), m_numberOfActors(0), m_numberOfGroups(0) {
   // Garden
-  RcActor *garden1 = new RcActor(this, sender, "00F000000FFF", "00F000000FF0"); // Garten-Steckdose I
-  RcActor *garden2 = new RcActor(this, sender, "00F0FF000FFF", "00F0FF000FF0"); // Garten-Steckdose II
-  RcActor *garden3 = new RcActor(this, sender, "00F0F0000FFF", "00F0F0000FF0"); // Garten-Steckdose III
+  // Actor On: 00F000000FFF/262165, Off: 00F000000FF0/262164 Garten-Steckdose I
+  RcActor *garden1 = new RcActor(this, sender, 262165, 262164);
+  // Actor On: 00F0FF000FFF/282645, Off: 00F0FF000FF0/282644 Garten-Steckdose II
+  RcActor *garden2 = new RcActor(this, sender, 282645, 282644);
+  // Actor On: 00F0F0000FFF/278549, Off: 00F0F0000FF0/278548 Garten-Steckdose III
+  RcActor *garden3 = new RcActor(this, sender, 278549, 278548);
 
   // living room
-  RcActor *living1 = new RcActor(this, sender, "000000FFFF0F", "000000FFFFF0"); // Stehlampe
-  RcActor *living2 = new RcActor(this, sender, "00000F0FFF0F", "00000F0FFFF0"); // Eiswürfel
-  RcActor *living3 = new RcActor(this, sender, "00000FF0FF0F", "00000FF0FFF0"); // Vitrine
+  // Actor On: 000000FFFF0F/1361, Off: 000000FFFFF0/1364 Stehlampe
+  RcActor *living1 = new RcActor(this, sender, 1361, 1364);
+  // Actor On: 00000F0FFF0F/4433, Off: 00000F0FFFF0/4436 Eiswürfel
+  RcActor *living2 = new RcActor(this, sender, 4433, 4436);
+  // Actor On: 00000FF0FF0F/5201, Off: 00000FF0FFF0/5204 Vitrine
+  RcActor *living3 = new RcActor(this, sender, 5201, 5204);
 
-  // Group 1 garden (DIP 01111, switch A)
-  GroupActor *groupGarden1 = new GroupActor(this, 30, 1, "F00000FFFF0F", "F00000FFFFF0"); // Alle Gartendosen gleichzeitig
-  // Group 2 garden (DIP 01111, switch B)
-  GroupActor *groupGarden2 = new GroupActor(this, 31, 1, "F0000F0FFF0F", "F0000F0FFFF0"); // Brunnen
-  // Group 3 garden (DIP 01111, switch C)
-  GroupActor *groupGarden3 = new GroupActor(this, 32, 1, "F0000FF0FF0F", "F0000FF0FFF0"); // Lampe
-  // Group 4 garden (DIP 01111, switch D)
-  GroupActor *groupGarden4 = new GroupActor(this, 33, 1, "F0000FFF0F0F", "F0000FFF0FF0"); // Steckdose
+/*
+//B ON:  FFFF0F0FFF0F
+//B OFF: FFFF0F0FFFF0
+  
+  RcActor *experimentActor1 = new RcActor(this, sender, triState2Decimal("F00000FFFF0F"), triState2Decimal("F00000FFFFF0"));
+//  RcActor *experimentActor2 = new RcActor(this, sender, 5592415, 5592415);
+  GroupActor *experimentGroup = new GroupActor(this, 20, 1, 1, 1);
+  experimentGroup->addActor(experimentActor1);//->addActor(experimentActor2);
+  // AN:  5510417 5510495 FFF00FFF0F0F
+  // AUS: 5510420 5510495 FFF00FFF0FFF
+*/
+  // Group 1 garden (DIP 01111, switch A) Alle Gartendosen gleichzeitig
+  // Id: 30 On: F00000FFFF0F/4195665, Off: F00000FFFFF0/4195668
+  GroupActor *groupGarden1 = new GroupActor(this, 30, 1, 4195665, 4195668);
+  // Group 2 garden (DIP 01111, switch B) Brunnen
+  // Id: 31 On: F0000F0FFF0F/4198737, Off: F0000F0FFFF0/4198740
+  GroupActor *groupGarden2 = new GroupActor(this, 31, 1, 4198737, 4198740);
+  // Group 3 garden (DIP 01111, switch C) Lampe
+  // Id: 32 On: F0000FF0FF0F/4199505, Off: F0000FF0FFF0/4199508
+  GroupActor *groupGarden3 = new GroupActor(this, 32, 1, 4199505, 4199508);
+  // Group 4 garden (DIP 01111, switch D) Steckdose
+  // Id: 33 On: F0000FFF0F0F/4199697, Off: F0000FFF0FF0/4199700
+  GroupActor *groupGarden4 = new GroupActor(this, 33, 1, 4199697, 4199700);
 
-  // Group 1 living room (DIP 00111, switch A)
-  GroupActor *groupLivingRoom1 = new GroupActor(this, 40, 2, "FF0000FFFF0F", "FF0000FFFFF0"); // Stehlampe
-  // Group 2 living room (DIP 00111, switch B)
-  GroupActor *groupLivingRoom2 = new GroupActor(this, 41, 2, "FF000F0FFF0F", "FF000F0FFFF0"); // Eiswürfel
-  // Group 3 living room (DIP 00111, switch C)
-  GroupActor *groupLivingRoom3 = new GroupActor(this, 42, 2, "FF000FF0FF0F", "FF000FF0FFF0"); // Vitrine
-  // Group 4 living room (DIP 00111, switch D)
-  GroupActor *groupLivingRoom4 = new GroupActor(this, 43, 2, "FF000FFF0F0F", "FF000FFF0FF0"); // Stehlampe und Eiswürfel
+  // Group 1 living room (DIP 00111, switch A) Stehlampe
+  // Id: 40 On: FF0000FFFF0F/5244241, Off: FF0000FFFFF0/5244244
+  GroupActor *groupLivingRoom1 = new GroupActor(this, 40, 2, 5244241, 5244244);
+  // Group 2 living room (DIP 00111, switch B) Eiswürfel
+  // Id: 41 On: FF000F0FFF0F/5247313, Off: FF000F0FFFF0/5247316
+  GroupActor *groupLivingRoom2 = new GroupActor(this, 41, 2, 5247313, 5247316);
+  // Group 3 living room (DIP 00111, switch C) Vitrine
+  // Id: 42 On: FF000FF0FF0F/5248081, Off: FF000FF0FFF0/5248084
+  GroupActor *groupLivingRoom3 = new GroupActor(this, 42, 2, 5248081, 5248084);
+  // Group 4 living room (DIP 00111, switch D) Stehlampe und Eiswürfel
+  // Id: 43 On: FF000FFF0F0F/5248273, Off: FF000FFF0FF0/5248276
+  GroupActor *groupLivingRoom4 = new GroupActor(this, 43, 2, 5248273, 5248276);
 
   // fill garden groups with actors
   groupGarden1->addActor(garden1)->addActor(garden2)->addActor(garden3);
@@ -51,7 +76,7 @@ GroupBundle::GroupBundle(RCSwitch *sender) : m_actors(NULL), m_groups(NULL), m_n
   groupLivingRoom1->addActor(living1);
   groupLivingRoom2->addActor(living2);
   groupLivingRoom3->addActor(living3);
-  groupLivingRoom4->addActor(living1)->addActor(living2);
+  groupLivingRoom4->addActor(living1)->addActor(living2)->addActor(living3);
 }
 
 void GroupBundle::addGroup(GroupActor *actor) {
@@ -82,7 +107,7 @@ void GroupBundle::addActor(Actor *actor) {
   }
 }
 
-void GroupBundle::handleSwitchCode(unsigned long code) const {
+void GroupBundle::handleSwitchCode(unsigned long code) {
   // iterate vector of actors...
   for (int i = 0; i < m_numberOfActors ; ++i) {
     // ... and check all of them
@@ -93,8 +118,8 @@ void GroupBundle::handleSwitchCode(unsigned long code) const {
   }
 }
 
-void GroupBundle::printConfig(GroupPresenter& presenter) {
-  presenter.print();
+void GroupBundle::printConfig(GroupPresenter* presenter) {
+  presenter->print();
 }
 
 void GroupBundle::toggle(const byte id) {
@@ -107,4 +132,40 @@ void GroupBundle::toggle(const byte id) {
     }
   }
 }
+
+void GroupBundle::switchGroup(const byte id, bool toState) {
+  // iterate vector of actors...
+  for (int i = 0; i < m_numberOfGroups ; ++i) {
+    // ... and check all of them
+    if (m_groups[i]->switchGroup(id, toState)) {
+      // until one of them matches
+      return;
+    }
+  }
+}
+
+static unsigned long GroupBundle::triState2Decimal(const char *sCodeWord) {
+  // turn the tristate code word into the corresponding bit pattern, then send it
+  unsigned long code = 0;
+  unsigned int length = 0;
+  for (const char* p = sCodeWord; *p; p++) {
+    code <<= 2L;
+    switch (*p) {
+      case '0':
+        // bit pattern 00
+        break;
+      case 'F':
+        // bit pattern 01
+        code |= 1L;
+        break;
+      case '1':
+        // bit pattern 11
+        code |= 3L;
+        break;
+    }
+    length += 2;
+  }
+  return code;
+}
+
 

@@ -14,17 +14,17 @@
 
 class RcActor : public Actor {
 public:
-    RcActor(GroupBundle *bundle, const RCSwitch* sender, const char *codeOn, const char *codeOff);
+    RcActor(GroupBundle *bundle, const RCSwitch* sender, unsigned long codeOn, unsigned long codeOff);
     
     // switch actor on
-    virtual void switchOn() const;
+    virtual void switchOn();
 
     // switch actor off
-    virtual void switchOff() const;
+    virtual void switchOff();
 
 // private methods
 private:
-    void sendCode(unsigned long code) const;
+    void sendCode(unsigned long code);
 
 // private members
 private:
